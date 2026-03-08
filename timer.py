@@ -1,36 +1,42 @@
-import streamlit as st, time
+import streamlit as st
 
-st.set_page_config("TM Timer", layout="wide")
+st.set_page_config("TM Timer", layout="wide", initial_sidebar_state="collapsed")
+st.markdown("""<style>
+    .stApp {background:#000 !important}
+    header, footer, #MainMenu, .stDeployButton {display:none !important}
+    .block-container {padding-top:3vh !important}
+    div.stButton>button {
+        height:150px !important;
+        font-size:36px !important;
+        font-weight:bold !important;
+    }
+</style>""", unsafe_allow_html=True)
 
-def lights(g=0, y=0, r=0):
-    def dot(on, c):
-        s = f"background:{c};box-shadow:0 0 40px {c},0 0 80px {c}" if on else "background:#333"
-        return f"<div style='width:200px;height:200px;border-radius:50%;{s};display:inline-block;margin:20px'></div>"
-    return f"<div style='text-align:center;background:#111;padding:40px;border-radius:20px'>{dot(g,'#2ecc71')}{dot(y,'#f1c40f')}{dot(r,'#e74c3c')}</div>"
+if "lit" not in st.session_state:
+    st.session_state.lit = None
 
-st.title("Speech Timer")
-mode = st.selectbox("Speech", ["5-7 min", "1-2 min Table Topics"])
-G, Y, R = (5, 6, 7) if "5" in mode else (1, 1.5, 2)
+def click(color):
+    st.session_state.lit = None if st.session_state.lit == color else color
 
-if "lit" not in st.session_state: st.session_state.lit = [0, 0, 0]
+COLORS = {"green": "#2ecc71", "yellow": "#f1c40f", "red": "#e74c3c"}
+
+dots = ""
+for name, c in COLORS.items():
+    on = st.session_state.lit == name
+    fill = c if on else "#111"
+    glow = f"box-shadow:0 0 40px {c},0 0 80px {c};" if on else ""
+    dots += (
+        f"<div style='width:200px;height:200px;border-radius:50%;"
+        f"background:{fill};border:6px solid #888;"
+        f"{glow}display:inline-block;margin:0 25px'></div>"
+    )
+
+st.markdown(
+    f"<div style='text-align:center;padding:30px'>{dots}</div>",
+    unsafe_allow_html=True,
+)
+
 c1, c2, c3 = st.columns(3)
-if c1.button("Green", use_container_width=True):
-    st.session_state.lit = [1, 0, 0] if not st.session_state.lit[0] else [0, 0, 0]
-if c2.button("Yellow", use_container_width=True):
-    st.session_state.lit = [0, 1, 0] if not st.session_state.lit[1] else [0, 0, 0]
-if c3.button("Red", use_container_width=True):
-    st.session_state.lit = [0, 0, 1] if not st.session_state.lit[2] else [0, 0, 0]
-
-if st.button("Start Timer", use_container_width=True):
-    panel, clock = st.empty(), st.empty()
-    t0 = time.time()
-    while True:
-        e = (time.time() - t0) / 60
-        m, s = divmod(int(time.time() - t0), 60)
-        panel.markdown(lights(e >= G, e >= Y, e >= R), unsafe_allow_html=True)
-        clock.markdown(
-            f"<h1 style='text-align:center;font-family:monospace;font-size:60px'>{m:02d}:{s:02d}</h1>",
-            unsafe_allow_html=True)
-        time.sleep(0.2)
-else:
-    st.markdown(lights(*st.session_state.lit), unsafe_allow_html=True)
+c1.button("GREEN", on_click=click, args=("green",), use_container_width=True)
+c2.button("YELLOW", on_click=click, args=("yellow",), use_container_width=True)
+c3.button("RED", on_click=click, args=("red",), use_container_width=True)
