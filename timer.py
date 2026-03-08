@@ -4,12 +4,8 @@ st.set_page_config("TM Timer", layout="wide", initial_sidebar_state="collapsed")
 st.markdown("""<style>
     .stApp {background:#000 !important}
     header, footer, #MainMenu, .stDeployButton {display:none !important}
-    .block-container {padding-top:3vh !important}
-    div.stButton>button {
-        height:150px !important;
-        font-size:36px !important;
-        font-weight:bold !important;
-    }
+    .block-container {padding-top:5vh !important}
+    div.stButton>button {height:80px !important; font-size:24px !important}
 </style>""", unsafe_allow_html=True)
 
 if "lit" not in st.session_state:
@@ -20,6 +16,7 @@ def click(color):
 
 COLORS = {"green": "#2ecc71", "yellow": "#f1c40f", "red": "#e74c3c"}
 
+# Build the lights
 dots = ""
 for name, c in COLORS.items():
     on = st.session_state.lit == name
@@ -32,11 +29,12 @@ for name, c in COLORS.items():
     )
 
 st.markdown(
-    f"<div style='text-align:center;padding:30px'>{dots}</div>",
+    f"<div style='text-align:center;padding:40px'>{dots}</div>",
     unsafe_allow_html=True,
 )
 
+# Buttons
 c1, c2, c3 = st.columns(3)
-c1.button("GREEN", on_click=click, args=("green",), use_container_width=True)
-c2.button("YELLOW", on_click=click, args=("yellow",), use_container_width=True)
-c3.button("RED", on_click=click, args=("red",), use_container_width=True)
+c1.button("Green", on_click=click, args=("green",), use_container_width=True)
+c2.button("Yellow", on_click=click, args=("yellow",), use_container_width=True)
+c3.button("Red", on_click=click, args=("red",), use_container_width=True)
